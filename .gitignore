@@ -1,2 +1,6 @@
 
 backend/.idea
+.idea
+backend/go.mod
+backend/go.sum
+backend/go.mod
