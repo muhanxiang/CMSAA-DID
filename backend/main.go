@@ -11,10 +11,12 @@ import (
 func main() {
 	pairing := cmsaa.Generate(160, 512)
 	aaAmount := 10
-	issuer, verifiers, holder := &system.Issuer{}, make([]*system.Verifier, aaAmount), &system.Holder{}
+	issuer, verifiers, holder, service := &system.Issuer{}, make([]*system.Verifier, aaAmount), &system.Holder{}, &system.Service{}
 	issuer.Init(pairing.Pairing, pairing.G1)
 	for _, verifier := range verifiers {
 		verifier.Init(pairing.Pairing, pairing.H1)
 	}
 	holder.Registrate(issuer.IssueCertificate(pairing.Pairing, pairing.G1))
+	service.Init("能最后得到我吗勇士?")
+	holder.SetHash(service.HashMessage(pairing.Pairing))
 }
