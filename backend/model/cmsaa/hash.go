@@ -6,15 +6,12 @@ import (
 	"github.com/Nik-U/pbc"
 )
 
-type Hash struct {
-}
-
-func (hash *Hash) H0FromMessage(m string, pairing *pbc.Pairing) *pbc.Element {
+func H0FromMessage(m string, pairing *pbc.Pairing) *pbc.Element {
 	rawHash := sha256.Sum256([]byte(m))
 	return pairing.NewG2().SetFromHash(rawHash[:])
 }
 
-func (hash *Hash) H1FromSplicedPks(head *pbc.Element, pks []*pbc.Element, pairing *pbc.Pairing) *pbc.Element {
+func H1FromSplicedPks(head *pbc.Element, pks []*pbc.Element, pairing *pbc.Pairing) *pbc.Element {
 	var allBytes []byte
 	allBytes = append(allBytes, head.Bytes()...)
 	for _, pk := range pks {
