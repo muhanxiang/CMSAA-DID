@@ -1,6 +1,7 @@
 package system
 
 import (
+	"backend/model/cmsaa"
 	"errors"
 	"fmt"
 	"github.com/Nik-U/pbc"
@@ -40,7 +41,8 @@ func (verifier *Verifier) SetVerifierAuthMaterial(V, C, u, Y *pbc.Element) {
 	}
 }
 
-func (verifier *Verifier) Verify(pairing *pbc.Pairing, messageHash, g1, g2, y, Zid, Zv, Zr *pbc.Element) (*pbc.Element, error) {
+func (verifier *Verifier) VerifyAndSign(pairing *pbc.Pairing, messageHash, g1, g2, y, Zid, Zv, Zr *pbc.Element, vlist []*Verifier) (*pbc.Element, error) {
+	//verify
 	c, V, C, u, Y := verifier.authMaterial.c, verifier.authMaterial.V, verifier.authMaterial.C, verifier.authMaterial.u, verifier.authMaterial.Y
 	temp1 := pairing.NewG1().PowZn(C, c)
 	temp1.Mul(temp1, pairing.NewG1().PowZn(g2, Zr))
@@ -61,5 +63,13 @@ func (verifier *Verifier) Verify(pairing *pbc.Pairing, messageHash, g1, g2, y, Z
 		fmt.Println(temp2)
 		return nil, errors.New("验证失败，等式2不成立")
 	}
-	return nil, nil
+	//sign
+	pkList := make([]*pbc.Element, len(vlist))
+	for i, v := range vlist {
+		pkList[i] = v.Pk
+	}
+	ai := cmsaa.H1FromSplicedPks(verifier.Pk, pkList, pairing)
+	si := pairing.NewG2().Set(messageHash)
+	si.PowZn(si, pairing.NewZr().Mul(ai, verifier.sk))
+	return si, nil
 }

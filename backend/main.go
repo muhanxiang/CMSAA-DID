@@ -29,11 +29,12 @@ func main() {
 		verifier.SetVerifierAuthMaterial(V, C, u, Y)
 		c := verifier.Auth2(pairing.Pairing)
 		hm, Zid, Zv, Zr := holder.Auth3(pairing.Pairing, c)
-		_, err := verifier.Verify(pairing.Pairing, hm, pairing.G1, pairing.G2, issuer.Y, Zid, Zv, Zr)
+		signature, err := verifier.VerifyAndSign(pairing.Pairing, hm, pairing.G1, pairing.G2, issuer.Y, Zid, Zv, Zr, verifiers)
 		if err != nil {
-			fmt.Println(err.Error())
-		} else {
-			fmt.Println("验证成功")
+			fmt.Printf("验证与签名过程失败，返回错误：%v\n", err.Error())
+			return
 		}
+		holder.SetSig(signature)
 	}
+	//签名验证
 }

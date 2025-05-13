@@ -9,6 +9,7 @@ type Holder struct {
 	userCertificate *cmsaa.UserCertificate
 	messageHash     *pbc.Element
 	authMaterial    *holderAuthMaterial
+	signatures      []*pbc.Element
 }
 
 type holderAuthMaterial struct {
@@ -62,4 +63,8 @@ func (holder *Holder) Auth3(pairing *pbc.Pairing, c *pbc.Element) (_, Zid, Zv, Z
 	Zv = pairing.NewZr().Sub(holder.authMaterial.t, pairing.NewZr().Mul(holder.authMaterial.v, c))
 	Zr = pairing.NewZr().Sub(holder.authMaterial.b, pairing.NewZr().Mul(holder.authMaterial.r, c))
 	return holder.messageHash, Zid, Zv, Zr
+}
+
+func (holder *Holder) SetSig(signature *pbc.Element) {
+	holder.signatures = append(holder.signatures, signature)
 }
