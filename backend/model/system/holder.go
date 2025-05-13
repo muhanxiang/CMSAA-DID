@@ -10,6 +10,7 @@ type Holder struct {
 	messageHash     *pbc.Element
 	authMaterial    *holderAuthMaterial
 	signatures      []*pbc.Element
+	multiSignature  *pbc.Element
 }
 
 type holderAuthMaterial struct {
@@ -67,4 +68,12 @@ func (holder *Holder) Auth3(pairing *pbc.Pairing, c *pbc.Element) (_, Zid, Zv, Z
 
 func (holder *Holder) SetSig(signature *pbc.Element) {
 	holder.signatures = append(holder.signatures, signature)
+}
+
+func (holder *Holder) AggregateSig(pairing *pbc.Pairing) *pbc.Element {
+	holder.multiSignature = pairing.NewG2().Set1()
+	for _, sig := range holder.signatures {
+		holder.multiSignature.Mul(holder.multiSignature, sig)
+	}
+	return holder.multiSignature
 }

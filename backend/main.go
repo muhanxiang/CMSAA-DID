@@ -21,7 +21,7 @@ func main() {
 		verifiers[i].Init(pairing.Pairing, pairing.H1)
 	}
 	holder.Registrate(issuer.IssueCertificate(pairing.Pairing, pairing.G1))
-	service.Init("能最后得到我吗勇士?")
+	service.Init("我叫牟翰翔，cmsaa构建成功")
 	//3.服务请求
 	holder.SetHash(service.HashMessage(pairing.Pairing))
 	for _, verifier := range verifiers {
@@ -37,4 +37,10 @@ func main() {
 		holder.SetSig(signature)
 	}
 	//签名验证
+	message, err := service.VerifyAndProvideService(pairing.Pairing, pairing.H1, holder.AggregateSig(pairing.Pairing), verifiers)
+	if err != nil {
+		fmt.Printf("验证多签名与提供服务过程失败，返回错误：%v\n", err.Error())
+		return
+	}
+	fmt.Printf("多签名验证成功，提供消息：%v\n", message)
 }
