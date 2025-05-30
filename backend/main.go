@@ -2,22 +2,22 @@ package main
 
 import (
 	"backend/model/cmsaa"
-	"backend/model/system"
+	"backend/model/system/entity"
 	"fmt"
 )
 
 //TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
-func main() {
+func CmsaaSimulator() {
 	//1.系统初始化
 	pairing := cmsaa.Generate(160, 512)
 	aaAmount := 10
-	issuer, verifiers, holder, service := &system.Issuer{}, make([]*system.Verifier, aaAmount), &system.Holder{}, &system.Service{}
+	issuer, verifiers, holder, service := &entity.Issuer{}, make([]*entity.Verifier, aaAmount), &entity.Holder{}, &entity.Service{}
 	//2.用户注册
 	issuer.Init(pairing.Pairing, pairing.G1)
 	for i := range verifiers {
-		verifiers[i] = &system.Verifier{}
+		verifiers[i] = &entity.Verifier{}
 		verifiers[i].Init(pairing.Pairing, pairing.H1)
 	}
 	holder.Registrate(issuer.IssueCertificate(pairing.Pairing, pairing.G1))
@@ -43,4 +43,8 @@ func main() {
 		return
 	}
 	fmt.Printf("多签名验证成功，提供消息：%v\n", message)
+}
+
+func main() {
+
 }
