@@ -30,8 +30,7 @@
 │   │   ├── did/material/    # W3C DID 兼容的数据结构定义与 JSON 序列化
 │   │   └── system/entity/   # 协议参与实体 (Holder, RANode, Verifier, Service)
 │   ├── main.go              # 主流程模拟器入口
-│   └── main_test.go         # 异常流测试用例
-└── essay/                   # 相关大纲与文稿资料
+└── main_test.go         # 异常流测试用例
 ```
 
 ## 环境依赖
