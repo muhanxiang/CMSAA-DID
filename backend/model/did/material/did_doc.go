@@ -1,27 +1,34 @@
 package material
 
-import "backend/model/cmsaa"
+import (
+	"encoding/json"
+	"backend/model/cmsaa"
+)
 
 type DidDocument struct {
-	Id        string              //did文档id
-	PublicKey []*DidPublicKeyData //持有的公钥信息
-	Proof     *DidProof           //签名信息
+	Id        string              `json:"id"`
+	PublicKey []*DidPublicKeyData `json:"publicKey"`
+	Proof     *DidProof           `json:"proof,omitempty"`
 }
 
 type DidPublicKeyData struct {
-	Id           string                    //公钥id
-	Type         string                    //密钥算法
-	PublicKeyHex string                    //公钥的十六进制编码表示
-	PublicParams *CryptographyPublicParams //算法公共参数
+	Id           string                    `json:"id"`
+	Type         string                    `json:"type"`
+	PublicKeyHex string                    `json:"publicKeyHex"`
+	PublicParams *CryptographyPublicParams `json:"publicParams,omitempty"`
 }
 
 type DidProof struct {
-	Type           string //签名算法
-	Creator        string //签名公钥的id
-	signatureValue string //签名值
+	Type           string `json:"type"`
+	Creator        string `json:"creator"`
+	SignatureValue string `json:"signatureValue"`
 }
 
 type CryptographyPublicParams struct {
-	Id     string
-	Paring *cmsaa.Pairing
+	Id     string         `json:"id"`
+	Paring *cmsaa.Pairing `json:"-"` // 不直接序列化 PBC 对象
+}
+
+func (doc *DidDocument) ToJSONBytes() ([]byte, error) {
+	return json.Marshal(doc)
 }

@@ -29,6 +29,67 @@ func (holder *Holder) Registrate(userCertificate *cmsaa.UserCertificate) {
 	holder.userCertificate = userCertificate
 }
 
+// GenerateID 为分布式注册生成一个随机 ID
+func (holder *Holder) GenerateID(pairing *pbc.Pairing) *pbc.Element {
+	id := pairing.NewZr().Rand()
+	// 暂存 ID，以便后续聚合时封装成完整证书
+	if holder.userCertificate == nil {
+		holder.userCertificate = &cmsaa.UserCertificate{ID: id}
+	} else {
+		holder.userCertificate.ID = id
+	}
+	return id
+}
+
+// AggregateCredential 使用拉格朗日插值聚合部分凭证
+func (holder *Holder) AggregateCredential(pairing *pbc.Pairing, partialCreds map[int]*pbc.Element) error {
+	if len(partialCreds) == 0 {
+		return nil
+	}
+	
+	// 拉格朗日插值聚合: C = prod C_i^{L_i(0)}
+	aggregatedCert := pairing.NewG1().Set1()
+	
+	// 提取参与的节点 ID
+	var nodeIDs []int
+	for id := range partialCreds {
+		nodeIDs = append(nodeIDs, id)
+	}
+
+	for _, i := range nodeIDs {
+		// 计算拉格朗日系数 L_i(0)
+		li := pairing.NewZr().Set1()
+		xi := pairing.NewZr().SetInt32(int32(i))
+		
+		for _, j := range nodeIDs {
+			if i == j {
+				continue
+			}
+			xj := pairing.NewZr().SetInt32(int32(j))
+			num := pairing.NewZr().Set(xj)
+			den := pairing.NewZr().Sub(xj, xi)
+			denInv := pairing.NewZr().Invert(den)
+			term := pairing.NewZr().Mul(num, denInv)
+			li.Mul(li, term)
+		}
+		
+		// term = C_i^{L_i(0)}
+		part := partialCreds[i]
+		term := pairing.NewG1().PowZn(part, li)
+		aggregatedCert.Mul(aggregatedCert, term)
+	}
+	
+	holder.userCertificate.Certificate = aggregatedCert
+	return nil
+}
+
+func (holder *Holder) GetCertificate() *pbc.Element {
+	if holder.userCertificate != nil {
+		return holder.userCertificate.Certificate
+	}
+	return nil
+}
+
 func (holder *Holder) SetHash(messageHash *pbc.Element) {
 	holder.messageHash = messageHash
 }
