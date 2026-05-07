@@ -5,6 +5,10 @@
 ## 项目简介
 
 本项目旨在复现大论文《一种具有隐私保护的多方授权系统的设计与实现》中的核心密码学协议与业务流程。
+- **论文链接**：[https://www.chinaaet.com/article/3000176882](https://www.chinaaet.com/article/3000176882)
+- **所属期刊**：《电子技术应用》 (ChinaAET)
+- **作者**：牟翰翔 等
+
 通过结合 **W3C DID/VC 架构**、**Boneh-Drijvers-Neven 紧凑多重签名** 以及 **交互式零知识集合成员证明**，本系统能够在保证用户绝对匿名性的同时，实现安全、可靠的多方授权。
 
 ### 核心特性
@@ -73,3 +77,9 @@ go test -v -bench=.
 cd backend
 go test -v -run TestSimulator_ExceptionFlow_InsufficientCredentials
 ```
+
+## 版权与使用声明
+
+本项目代码及相关实现受版权保护。
+**未经原作者（牟翰翔）授权，严禁将本项目用于任何商业用途、公开发表或二次分发。**
+如需在学术研究、工程项目中引用或使用本软件，请务必提前与作者取得联系并获得许可。
